@@ -40,5 +40,5 @@ if prompt := st.chat_input(placeholder="How many outstanding shares of stock did
     with st.chat_message("assistant"):
         st_callback = StreamlitCallbackHandler(st.container())
         response = llm.invoke(Input(input=prompt), {"callbacks": [st_callback]})
-        st.session_state["messages"].append({"role": "assistant", "content": response})
+        st.session_state["messages"].append({"role": "assistant", "content": response["output"]})
         st.write(response["output"])
