@@ -21,6 +21,10 @@ services:
       - POLYGON_API_ENDPOINT=${POLYGON_API_ENDPOINT}
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
       - PORT=${PORT}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
+      - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
   chat:
     container_name: langchain-financial-reporting-chat
     image: langchain-financial-reporting-chat:latest
