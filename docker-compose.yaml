@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  api:
+    container_name: langchain-financial-reporting-api
+    image: langchain-financial-reporting-api:latest
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      args:
+        - PORT=${PORT}
+    ports:
+      - ${PORT}:${PORT}
+    env_file:
+      - .env
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_MODEL=${AZURE_OPENAI_MODEL}
+      - OPENAI_API_VERSION=${OPENAI_API_VERSION}
+      - POLYGON_API_KEY=${POLYGON_API_KEY}
+      - POLYGON_API_ENDPOINT=${POLYGON_API_ENDPOINT}
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - PORT=${PORT}
