@@ -12,9 +12,7 @@ def get_stock_quote(ticker: str) -> dict:
     Used for getting the price and information about the stock for today.
     """
     prices = yf.Ticker(ticker)
-    basic_info = dict(prices.fast_info)
 
     return {
-        "basic_info": basic_info,
         "information": prices.info   
     }

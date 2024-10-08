@@ -32,7 +32,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
     ports:
-      - 8501:8501
+      - ${CHAT_PORT}:${CHAT_PORT}
     env_file:
       - .env
     environment:
