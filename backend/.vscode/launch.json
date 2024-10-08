@@ -16,6 +16,19 @@
                 "--port",
                 "9500"
             ]
-        }
+        },
+        {
+            "name": "LangGraph",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "src.graph_server:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9500"
+            ]
+        },
     ]
 }

@@ -1,13 +1,16 @@
 import os
+from uuid import uuid4
 from langserve import RemoteRunnable
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from pydantic import BaseModel
 import streamlit as st
+from typing import List, Union
 
 llm = RemoteRunnable(os.getenv("API_ENDPOINT"))
 
-class Input(BaseModel):
-    input: str
+class ChatInputType(BaseModel):
+    messages: List[Union[HumanMessage, AIMessage, SystemMessage]]
 
 with st.sidebar:
     "Coming Soon"
@@ -29,6 +32,7 @@ if "messages" not in st.session_state:
             """
         }
     ]
+    st.session_state["thread_id"] = uuid4()
 
 for message in st.session_state["messages"]:
     st.chat_message(message["role"]).write(message["content"])
@@ -39,6 +43,6 @@ if prompt := st.chat_input(placeholder="How many outstanding shares of stock did
 
     with st.chat_message("assistant"):
         st_callback = StreamlitCallbackHandler(st.container())
-        response = llm.invoke(Input(input=prompt), {"callbacks": [st_callback]})
-        st.session_state["messages"].append({"role": "assistant", "content": response["output"]})
-        st.write(response["output"])
+        response = llm.invoke(ChatInputType(messages=[HumanMessage(prompt)]), {"callbacks": [st_callback], "configurable": {"thread_id":  st.session_state["thread_id"]}})
+        st.session_state["messages"].append({"role": "assistant", "content": response["messages"][-1].content})
+        st.write(response["messages"][-1].content)

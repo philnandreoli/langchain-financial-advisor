@@ -12,4 +12,4 @@ ARG PORT
 
 EXPOSE ${PORT:-8000}
 
-CMD exec uvicorn app.server:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD exec uvicorn app.graph_server:app --host 0.0.0.0 --port ${PORT:-8000}
