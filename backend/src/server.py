@@ -7,16 +7,14 @@ from .tools.get_stock_financials import get_stock_financials
 from .tools.get_weather import get_weather
 from .prompts import system_prompt
 from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate,PromptTemplate
 from langchain_openai.chat_models import AzureChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from pydantic import BaseModel
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
-from langgraph.checkpoint.memory import MemorySaver
 
 #Load environment variables from a .env file
 load_dotenv()
@@ -49,7 +47,8 @@ tools = [
 prompt = ChatPromptTemplate.from_messages(
     [
         SystemMessage(content=system_prompt.SYSTEM_PROMPT),
-        ("user", "{input}"),
+        MessagesPlaceholder(variable_name="chat_history", optional=True),
+        HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['input'], template="{input}")),
         MessagesPlaceholder(variable_name="agent_scratchpad")
     ]
 )
@@ -61,8 +60,6 @@ model = AzureChatOpenAI(
     streaming=True
 )
 
-memory = MemorySaver()
-
 model_with_tools = model.bind_tools(tools=tools)
 
 agent = create_tool_calling_agent(llm=model, tools=tools, prompt=prompt)
@@ -72,7 +69,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
 class Input(BaseModel):
     input: str
-    #chat_history: List[Union[HumanMessage, AIMessage, SystemMessage]]
+    chat_history:List[Union[HumanMessage, AIMessage, SystemMessage]]
 
 
 class Output(BaseModel):

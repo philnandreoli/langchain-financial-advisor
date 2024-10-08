@@ -10,14 +10,13 @@
 		8000
 	],
 	//"customizations": {	},
-	"postCreateCommand": "pip3 install -r requirements.txt",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"ms-python.python@2024.14.0"
 			]
 		}
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -25,7 +24,7 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install -r requirements.txt",
+	"postCreateCommand": "pip3 install -r requirements.txt"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
