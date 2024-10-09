@@ -1,0 +1,24 @@
+name: Build, Test and Deploy to Azure
+on: [push]
+permissions:
+  id-token: write
+
+jobs:
+  development:
+    environment: DEVELOPMENT
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure CLI Login
+      uses: Azure/login@v2.2.0
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Azure CLI script
+      uses: Azure/cli@v2.1.0
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
