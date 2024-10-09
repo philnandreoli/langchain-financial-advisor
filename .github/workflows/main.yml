@@ -30,6 +30,12 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          cd backend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t langchain-financial-reporting-api:${{ github.sha }} --file Dockerfile .
-      
+          cd backend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/financial-reporting-api:${{ github.sha }} --file Dockerfile .
+
+    - name: Build the Chat Image using Azure Container Registry
+      uses: Azure/cli@v2.1.0
+      with:
+        azcliversion: latest
+        inlineScript: |
+          cd frontend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/financial-reporting-chat:${{ github.sha }} --file Dockerfile .
 
