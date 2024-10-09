@@ -30,6 +30,6 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t langchain-financial-reporting-api:${{ github.sha }} --file ./backend/Dockerfile .
+          cd backend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t langchain-financial-reporting-api:${{ github.sha }} --file Dockerfile .
       
 
