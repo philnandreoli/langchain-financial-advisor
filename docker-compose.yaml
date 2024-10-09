@@ -2,7 +2,7 @@ version: '3.8'
 services:
   api:
     container_name: langchain-financial-reporting-api
-    image: langchain-financial-reporting-api:latest
+    image: langchain-financial-reporting-api:${TAG:-latest}
     build:
       context: backend
       dockerfile: Dockerfile
@@ -27,7 +27,7 @@ services:
       - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
   chat:
     container_name: langchain-financial-reporting-chat
-    image: langchain-financial-reporting-chat:latest
+    image: langchain-financial-reporting-chat:${TAG:-latest}
     build:
       context: frontend
       dockerfile: Dockerfile
