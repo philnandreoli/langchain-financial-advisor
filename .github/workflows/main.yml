@@ -22,3 +22,19 @@ jobs:
         inlineScript: |
           az account show
 
+    - name: Docker Login
+      uses: docker/login-action@v3.3.0
+      with:
+        registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USER }}
+        password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+
+    - name: Build the Docker Images
+      run: |
+        TAG=${{ github.sha }} docker-compose build
+
+    - name: Push the API Image to the Container Registry
+      run: |
+        docker push ${{ secrets.AZURE_CONTAINER_REGISTRY }}/langchain-financial-reporting-api:${{ github.sha }} 
+      
+
