@@ -27,11 +27,9 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          az acr task create \
+          az acr build \
             --registry ${{ secrets.AZURE_CONTAINER_REGIStRY }} \
-            --name langchain-financial-reporting-api \
             --image langchain-financial-reporting-api:${{ github.sha }} \
-            --context backend \
-            --file Dockerfile \
+            --file /backend/Dockerfile
       
 
