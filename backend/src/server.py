@@ -16,8 +16,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
 
+
 #Load environment variables from a .env file
 load_dotenv()
+
 
 # Initialize FastAPI app
 app = FastAPI(

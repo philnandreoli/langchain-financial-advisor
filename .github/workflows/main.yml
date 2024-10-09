@@ -1,5 +1,9 @@
 name: Build, Test and Deploy to Azure
-on: [push]
+on: 
+  push:
+    branches:
+      - main
+
 permissions:
   id-token: write
 

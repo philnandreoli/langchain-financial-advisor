@@ -27,6 +27,7 @@ Currently the functions are as follows:
     PORT=                               # Choose a port number you want the API to run on
     CHAT_PORT=8501
     API_ENDPOINT=                       http://langchain-financial-reporting-api:${PORT}/financials
+    APPLICATIONINSIGHTS_CONNECTION_STRING = # Retrieve this from your Azure Portal Deployment
    ```
 
 # Run the agent

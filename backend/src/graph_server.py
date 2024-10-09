@@ -1,3 +1,4 @@
+import os
 from .tools.get_stock_quote import get_stock_quote
 from .tools.get_stock_technical_indicators import get_stock_technical_indicators
 from .tools.get_stock_news import get_stock_news
@@ -20,7 +21,25 @@ from typing import List, Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from typing import Optional
+
+from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from opentelemetry import trace as trace_api
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+
+exporter = AzureMonitorTraceExporter.from_connection_string(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"))
+tracer_provider = TracerProvider()
+trace_api.set_tracer_provider(tracer_provider)
+trace.set_tracer_provider(tracer_provider)
+tracer = trace.get_tracer(__name__)
+span_processor = BatchSpanProcessor(exporter, schedule_delay_millis=60000)
+trace.get_tracer_provider().add_span_processor(span_processor)
+LangChainInstrumentor().instrument()
+
 
 #Load environment variables from a .env file
 load_dotenv()
@@ -58,7 +77,7 @@ model = AzureChatOpenAI(
     azure_deployment="gpt-4o",
     api_version="2023-03-15-preview",
     temperature=0,
-    streaming=True
+    streaming=True,
 )
 model_with_tools = model.bind_tools(tools=tools)
 
@@ -69,7 +88,6 @@ def should_continue(state: MessagesState):
     return "action"
 
 def call_model(state: MessagesState, config: RunnableConfig):
-    messages = filter_messages(state["messages"])
     response = model_with_tools.invoke(state["messages"], config=config)
     return {
         "messages": response
