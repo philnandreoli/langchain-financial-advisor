@@ -22,19 +22,16 @@ jobs:
         inlineScript: |
           az account show
 
-    - name: Docker Login
-      uses: docker/login-action@v3.3.0
+    - name: Build the API Image using Azure Container registry
+      uses: Azure/cli@v2.1.0
       with:
-        registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-        username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USER }}
-        password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-
-    - name: Build the Docker Images
-      run: |
-        TAG=${{ github.sha }} docker-compose build
-
-    - name: Push the API Image to the Container Registry
-      run: |
-        docker push ${{ secrets.AZURE_CONTAINER_REGISTRY }}/langchain-financial-reporting-api:${{ github.sha }} 
+        azcliversion: latest
+        inlineScript: |
+          az acr task create \
+            --registry ${{ secrets.AZURE_CONTAINER_REGIStRY }} \
+            --name langchain-financial-reporting-api \
+            --image langchain-financial-reporting-api:${{ github.sha }} \
+            --context backend \
+            --file Dockerfile \
       
 
