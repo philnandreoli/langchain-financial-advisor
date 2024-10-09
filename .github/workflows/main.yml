@@ -8,6 +8,9 @@ jobs:
     environment: DEVELOPMENT
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout Github Action
+      uses: actions/checkout@main
+      
     - name: Azure CLI Login
       uses: Azure/login@v2.2.0
       with:
@@ -27,6 +30,6 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t langchain-financial-reporting-api:${{ github.sha }} --file backend/Dockerfile .
+          az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t langchain-financial-reporting-api:${{ github.sha }} --file ./backend/Dockerfile .
       
 
