@@ -32,7 +32,7 @@ if "messages" not in st.session_state:
             """
         }
     ]
-    st.session_state["thread_id"] = uuid4()
+    st.session_state["thread_id"] = str(uuid4())
 
 for message in st.session_state["messages"]:
     st.chat_message(message["role"]).write(message["content"])
