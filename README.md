@@ -2,11 +2,15 @@
 This is a chat application that interacts with an API.  The API interacts with Open AI and determines what Functions to call based on the question users ask.   
 
 Currently the functions are as follows:
-- Get Weather
-- Get Stock Quote
-- Get Stock Technical Indicators
-- Get Stock News
-- Get Stock Financials
+   
+   ```
+   - Get Weather - Get's the weather for city, state, country
+   - Get Stock Quote - Get's the current stock price
+   - Get Stock Technical Indicators - Get's the technical indicators for a stock and calculates them over a 6 month history
+   - Get Stock News - Get's financial news for a stock symbol
+   - Get Stock Financials - Get's the financial results (10K/10Q) for a stock symbol
+   - Get Option Chains - Get's option chains (Calls & Puts) that are not in the money for a stock symbol 
+   ```
 
 # Getting Started
 1. Download the repo locally:
