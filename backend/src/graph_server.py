@@ -4,6 +4,7 @@ from .tools.get_stock_technical_indicators import get_stock_technical_indicators
 from .tools.get_stock_news import get_stock_news
 from .tools.get_stock_financials import get_stock_financials
 from .tools.get_weather import get_weather
+from .tools.get_options_chain import get_options_chain
 
 from langchain_openai import AzureChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
@@ -95,6 +96,7 @@ tools = [
     get_stock_technical_indicators, 
     get_stock_news, 
     get_stock_financials,
+    get_options_chain,
     get_weather
 ]
 
