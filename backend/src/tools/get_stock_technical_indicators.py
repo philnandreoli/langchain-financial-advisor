@@ -5,6 +5,8 @@ import yfinance as yf
 from pydantic import Field, BaseModel
 from langchain_core.tools import tool
 from typing import List
+from datetime import datetime, timedelta
+import pytz
 
 K_PERIOD=14
 D_PERIOD=3
@@ -29,48 +31,85 @@ class StockTechnicalIndicatorOutput(BaseModel):
     rsi: float = Field(description="The Relative Strength Index value")
     dr: float = Field(description="The daily range of the stock")
     adr: float = Field(description="The average daily range of the stock")
+    ma_50: float = Field(description="The 50-day moving average of the stock")
+    ma_200: float = Field(description="The 200-day moving average of the stock")
+    death_cross_signal: float = Field(description="The death cross signal value")
+    death_cross: float = Field(description="The death cross value")
+    golden_cross_signal: float = Field(description="The golden cross signal value")
+    golden_cross: float = Field(description="The golden cross value")
+    obv: float = Field(description="The On-Balance Volume value")
 
-@tool("get_stock_technical_indicators", args_schema=StockTechnicalIndicatorInput)
-def get_stock_technical_indicators(ticker: str ) -> List[StockTechnicalIndicatorOutput]:
-    """
-    Used for getting the technical indicators and historical data for a stock symbol.
-    """
-    prices = yf.Ticker(ticker).history(period="6mo")
-    
-    #Calculate the MACD - Moving Average Convergence Divergence
+# Helper Functions
+def calculate_macd(prices):
     prices.ta.macd(close="Close", fast=12, slow=26, signal=9, append=True)
     prices.rename(columns={"MACD_12_26_9": "macd", "MACDs_12_26_9": "macd_signal", "MACDh_12_26_9": "macd_histogram"}, inplace=True)
 
-    #Calculate the Stochastics
+def calculate_stochastics(prices):
     prices["n_high"] = prices["High"].rolling(K_PERIOD).max()
     prices["n_low"] = prices["Low"].rolling(K_PERIOD).min()
     prices["K"] = (prices["Close"] - prices["n_low"]) * 100 / (prices["n_high"] - prices["n_low"])
     prices["D"] = prices['K'].rolling(D_PERIOD).mean()
-    
-    #Calculate the RSI - Relative Strength Index
+
+def calculate_moving_averages(prices):
+    prices["ma_50"] = prices["Close"].rolling(window=50).mean()
+    prices["ma_200"] = prices["Close"].rolling(window=200).mean()
+
+def calculate_cross_signals(prices):
+    prices["death_cross_signal"] = prices['ma_50'] < prices['ma_200']
+    prices["death_cross"] = prices["death_cross_signal"].diff()
+    prices["golden_cross_signal"] = prices['ma_50'] > prices['ma_200']
+    prices['golden_cross'] = prices['golden_cross_signal'].diff()
+
+#Calculate Relative Strength Index
+def calculate_rsi(prices):
     delta = prices["Close"].diff()
     gain = delta.where(delta > 0, 0)
-    loss = -delta.where(delta < 0, 0) 
+    loss = -delta.where(delta < 0, 0)
     avg_gain = gain.rolling(7).mean()
     avg_loss = loss.rolling(7).mean()
     rs = avg_gain / avg_loss
-    rsi = 100 - (100 / (1 + rs))
-    prices["rsi"] = prices.index.map(rsi)
+    prices["rsi"] = 100 - (100 / (1 + rs))
 
-    #Calculate ADR - Average Daily Range
-    prices["dr"] = prices.apply(lambda x: x["High"] - x["Low"], axis=1)
+#Calculate Average Daily Range
+def calculate_adr(prices):
+    prices["dr"] = prices["High"] - prices["Low"]
     prices["adr"] = prices["dr"].rolling(7).mean()
 
-    #Reformat the datetimeindex array to be string in the format of YYYY-MM-DD
+#Calculate On-Balance Volume
+def calculate_obv(prices):
+    prices["obv"] = (np.sign(prices["Close"].diff()) * prices["Volume"]).fillna(0).cumsum()
+
+def format_prices(prices):
     prices.index = prices.index.strftime("%Y-%m-%d")
     prices.drop(columns=["Dividends", "Stock Splits"], axis=1, inplace=True)
     prices.rename(columns={"Date": "date", "Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}, inplace=True)
     prices.rename_axis("date", inplace=True)
 
-    stock_technical_indicators = prices.reset_index().to_dict(orient='records')
+@tool("get_stock_technical_indicators", args_schema=StockTechnicalIndicatorInput)
+def get_stock_technical_indicators(ticker: str) -> List[StockTechnicalIndicatorOutput]:
+    """
+    Used for getting the technical indicators and historical data for a stock symbol.
+    """
+    try:
+        prices = yf.Ticker(ticker).history(period="1y")
+        calculate_macd(prices)
+        calculate_stochastics(prices)
+        calculate_moving_averages(prices)
+        calculate_cross_signals(prices)
+        calculate_rsi(prices)
+        calculate_adr(prices)
+        calculate_obv(prices)
 
-    technical_indicators: List[StockTechnicalIndicatorOutput] = [StockTechnicalIndicatorOutput(**item) for item in stock_technical_indicators]
+        # Filter for the last 6 months
+        tz = 'America/New_York'
+        six_months_ago = datetime.now(pytz.timezone(tz)) - timedelta(days=6*30)
+        prices = prices[prices.index >= six_months_ago] 
+        format_prices(prices)
 
-    return technical_indicators
+        stock_technical_indicators = prices.reset_index().to_dict(orient='records')
+        technical_indicators: List[StockTechnicalIndicatorOutput] = [StockTechnicalIndicatorOutput(**item) for item in stock_technical_indicators]
 
-    #f"The relative Strength Index (RSI) for {symbol} is {rsi}.   The MACD for {symbol} is {macd} and the MACD Signal is {macd_s}.  The Stochastics for {symbol} is %K: {prices['%K']} and %D: {prices['%D']}"
+        return technical_indicators
+    except Exception as e:
+        print(f"Error fetching stock data: {e}")
+        return []

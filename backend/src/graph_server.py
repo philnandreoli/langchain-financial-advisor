@@ -11,6 +11,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import MessagesState, StateGraph, START, END
 from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
+from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langgraph.prebuilt import ToolNode
 from langserve import add_routes
 
@@ -32,6 +33,8 @@ from opentelemetry import trace as trace_api
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk import trace as trace_sdk
 
+from azure.identity import DefaultAzureCredential
+
 exporter = AzureMonitorTraceExporter.from_connection_string(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"))
 tracer_provider = TracerProvider()
 trace_api.set_tracer_provider(tracer_provider)
@@ -40,7 +43,6 @@ tracer = trace.get_tracer(__name__)
 span_processor = BatchSpanProcessor(exporter, schedule_delay_millis=60000)
 trace.get_tracer_provider().add_span_processor(span_processor)
 LangChainInstrumentor().instrument()
-
 
 #Load environment variables from a .env file
 load_dotenv()
@@ -107,7 +109,9 @@ model = AzureChatOpenAI(
     temperature=0,
     streaming=True,
 )
+
 model_with_tools = model.bind_tools(tools=tools)
+
 
 def should_continue(state: MessagesState):
     last_message = state["messages"][-1]
