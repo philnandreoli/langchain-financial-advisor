@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  backend:
+    image: mcr.microsoft.com/devcontainers/python:1-3.11-buster
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    links:
+      - frontend
+  
+  frontend:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bullseye
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity

@@ -10,3 +10,4 @@ azure-monitor-opentelemetry-exporter==1.0.0b30
 openinference-instrumentation-langchain==0.1.28
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
+langchain-azure-dynamic-sessions==0.2.0

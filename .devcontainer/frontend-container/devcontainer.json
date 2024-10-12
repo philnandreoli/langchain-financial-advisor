@@ -1,10 +1,10 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Gen AI UX",
-	"dockerComposeFile": "docker-compose.yaml",
-	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"name": "Gen AI UX - Streamlit",
+	"dockerComposeFile": "../../devcontainers-docker-compose.yaml",
+	"service": "frontend",
+	"workspaceFolder": "/workspaces/frontend",
 	"forwardPorts": [
 		5000,
 		8000
