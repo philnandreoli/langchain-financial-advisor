@@ -5,6 +5,7 @@ from .tools.get_stock_news import get_stock_news
 from .tools.get_stock_financials import get_stock_financials
 from .tools.get_weather import get_weather
 from .tools.get_options_chain import get_options_chain
+from .prompts.system_prompt import SYSTEM_PROMPT
 
 from langchain_openai import AzureChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
@@ -14,6 +15,7 @@ from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langgraph.prebuilt import ToolNode
 from langserve import add_routes
+from langchain_core.tools import Tool
 
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -47,31 +49,8 @@ LangChainInstrumentor().instrument()
 #Load environment variables from a .env file
 load_dotenv()
 
-
-SYSTEM_PROMPT = f"""
-You are a highly capable financial assistant named FinanceGPT. Your purpose is to provide insightful and concise analysis to help users make informed financial decisions. 
-If the question falls outside of the scope of Financial Analysis or Weather, please inform the user that you are unable to answer this question.
-
-When a user asks a question, follow these steps:
-1. Identify the relevant financial data needed to answer the query.
-2. Use the available tools to retrieve the necessary data, such as stock financials, news, technical statistics or weather.
-3. Analyze the retrieved data and any generated charts to extract key insights and trends.
-4. Formulate a concise response that directly addresses the user's question, focusing on the most important findings from your analysis.
-
-Remember:
-- Today's date is {datetime.today().strftime("%Y-%m-%d")}.
-- Yesterday's date is {(datetime.now() +  timedelta(days=-1)).strftime("%Y-%m-%d")}.
-- For RSI always Yesterday's date, for MACD and Stochastics always use todays date.
-- If you are providing a stock quote, use the closing price from today's date
-- Avoid simply regurgitating the raw data from the tools. Instead, provide a thoughtful interpretation and summary.
-- If the query cannot be satisfactorily answered using the available tools, kindly inform the user and suggest alternative resources or information they may need.
-- Add to the end of the response, These are AI Generated Answers, please do your own research before making any financial decisions.
-- ADR is Average Daily Range
-
-Your ultimate goal is to empower users with clear, actionable insights to navigate the financial landscape effectively.
-
-Remember your goal is to answer the users query and provide a clear, actionable answer.  
-"""
+class ChatInputType(BaseModel):
+    messages: List[Union[HumanMessage, AIMessage, SystemMessage]]
 
 app = FastAPI(
     title="Gen UI Backend",
@@ -90,8 +69,12 @@ app.add_middleware(
 
 memory = MemorySaver()
 
-class ChatInputType(BaseModel):
-    messages: List[Union[HumanMessage, AIMessage, SystemMessage]]
+credential = DefaultAzureCredential()
+
+repl = SessionsPythonREPLTool(
+    pool_management_endpoint=os.getenv("POOL_MANAGEMENT_ENDPOINT"),
+    description="A python shell that is used for running python code.   It can be used to chart technical statistics that are returned from the get_stock_technical_indicators tool."
+)
 
 tools = [
     get_stock_quote, 
@@ -99,7 +82,8 @@ tools = [
     get_stock_news, 
     get_stock_financials,
     get_options_chain,
-    get_weather
+    get_weather,
+    repl
 ]
 
 tool_node = ToolNode(tools)

@@ -9,7 +9,8 @@ Currently the functions are as follows:
    - Get Stock Technical Indicators - Get's the technical indicators for a stock and calculates them over a 6 month history
    - Get Stock News - Get's financial news for a stock symbol
    - Get Stock Financials - Get's the financial results (10K/10Q) for a stock symbol
-   - Get Option Chains - Get's option chains (Calls & Puts) that are not in the money for a stock symbol 
+   - Get Option Chains - Get's option chains (Calls & Puts) that are not in the money for a stock symbol
+   - Python Code Execution - The ability to run  python code with the ability to do charting
    ```
 
 # Getting Started
@@ -32,6 +33,13 @@ Currently the functions are as follows:
     CHAT_PORT=8501
     API_ENDPOINT=                       http://langchain-financial-reporting-api:${PORT}/financials
     APPLICATIONINSIGHTS_CONNECTION_STRING = # Retrieve this from your Azure Portal Deployment
+    # When using Azure Container Apps Dynamic Session Pools Endpoint you need have a Service Principal created. 
+    # Once the service principle has been created you need to assign it specifc roles. 
+    # You can read about it here: https://learn.microsoft.com/en-us/azure/container-apps/sessions?tabs=azure-cli#authentication
+    POOL_MANAGEMENT_ENDPOINT            # Azure Container Apps Dynamic Session Pools Endpoint
+    AZURE_CLIENT_ID=                    # Service Principal Client ID
+    AZURE_TENANT_ID=                    # Tentant ID where the service principal is
+    AZURE_CLIENT_SECRET=                # Client Secret for the service Principal
    ```
 
 # Run the agent
@@ -57,3 +65,6 @@ This project is licensed under the MIT License
 
 
 [1]:<https://docs.docker.com/get-docker/>
+[2]:<https://www.polygon.io>
+[3]:<https://www.openweather.org>
+[4]:<https://learn.microsoft.com/en-us/azure/container-apps/sessions?tabs=azure-cli#authentication>
