@@ -14,16 +14,17 @@ from langgraph.graph import MessagesState, StateGraph, START, END
 from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langgraph.prebuilt import ToolNode
-from langserve import add_routes
+from langserve import APIHandler
 from langchain_core.tools import Tool
 
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from typing import List, Union
+from typing import List, Union, Annotated
 from datetime import datetime, timedelta
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from sse_starlette import EventSourceResponse
 import uvicorn
 
 from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
@@ -127,9 +128,29 @@ workflow.add_edge("action", "agent")
 
 runnable = workflow.compile(checkpointer=memory).with_types(input_type=ChatInputType, output_type=dict).with_config({"configurable": {"thread_id": "{thread_id}"}})
 
-add_routes(app, runnable, path="/financials", playground_type="chat")
+async def _get_api_handerl() -> APIHandler: 
+    return APIHandler(runnable, path="/v2")
+
+# Ability to invoke a signle question
+@app.post("/v2/financials/invoke")
+async def v2_invoke(
+    request: Request, 
+    runnable: Annotated[APIHandler, Depends(_get_api_handerl)]
+) -> Response:
+    """Handle invoke request"""
+    return await runnable.invoke(request)
+
+# Ability to invoke a single question and get a stream of responses
+@app.post("/v2/financials/stream")
+async def v2_stream(
+    request: Request,
+    runnable: Annotated[APIHandler, Depends(_get_api_handerl)]
+) -> EventSourceResponse:
+    """Handle stream request"""
+    return await runnable.stream(request)
+
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=9500)
+    uvicorn.run(app, host="localhost", port=os.getenv("PORT"))
