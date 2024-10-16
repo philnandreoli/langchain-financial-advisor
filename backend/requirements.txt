@@ -8,6 +8,7 @@ langchain-openai==0.2.0
 pandas_ta==0.3.14b
 azure-monitor-opentelemetry-exporter==1.0.0b30
 openinference-instrumentation-langchain==0.1.28
+opentelemetry-instrumentation-fastapi==0.48b0
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
 langchain-azure-dynamic-sessions==0.2.0
