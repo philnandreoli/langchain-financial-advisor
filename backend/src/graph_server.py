@@ -53,17 +53,21 @@ LangChainInstrumentor().instrument()
 #Load environment variables from a .env file
 load_dotenv()
 
+# The format of the message that comes in from the client.  
 class ChatInputType(BaseModel):
     messages: List[Union[HumanMessage, AIMessage, SystemMessage]]
 
+# FastAPI Application
 app = FastAPI(
     title="Gen UI Backend",
     version="1.0",
     description="A simple api server using Langchain's Runnable interfaces",
 )
 
+# Instrument the FastAPI application with OpenTelemetry and send the data to Application Insights
 FastAPIInstrumentor.instrument_app(app)
 
+# Set up the CORS middleware to allow for cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -73,15 +77,21 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+# Initialize the memory save that will be used to save the state of the conversation in memory for a specific thread/user
 memory = MemorySaver()
 
+# Create the credential that will be leveraged to access the Azure Container Apps Session Pools
+# If you don't have AZURE_CLIENT_ID, AZURE_TENANT_ID and AZURE_CLIENT_SECRET as environmental variables, run az login and it will use
+# your credentials
 credential = DefaultAzureCredential()
 
+# Code Interpreter Tool that will be used to run python code in the context of the conversation
 repl = SessionsPythonREPLTool(
     pool_management_endpoint=os.getenv("POOL_MANAGEMENT_ENDPOINT"),
     description="A python shell that is used for running python code.   It can be used to chart technical statistics that are returned from the get_stock_technical_indicators tool."
 )
 
+# The tools that will be used to answer questions as part of the conversation
 tools = [
     get_stock_quote, 
     get_stock_technical_indicators, 
@@ -91,15 +101,15 @@ tools = [
     get_weather,
     repl
 ]
-
 tool_node = ToolNode(tools)
+
+# Define the Model that will be used to answer the questions and bind the tools to the model
 model = AzureChatOpenAI(
     azure_deployment="gpt-4o",
     api_version="2023-03-15-preview",
     temperature=0,
     streaming=True,
 )
-
 model_with_tools = model.bind_tools(tools=tools)
 
 
@@ -155,6 +165,7 @@ async def v2_stream(
     return await runnable.stream(request)
 
 
+# Run the API server
 if __name__ == "__main__":
     import uvicorn
 
