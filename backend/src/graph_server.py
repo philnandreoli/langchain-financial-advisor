@@ -35,8 +35,11 @@ from openinference.instrumentation.langchain import LangChainInstrumentor
 from opentelemetry import trace as trace_api
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk import trace as trace_sdk
-
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from azure.identity import DefaultAzureCredential
+from logging import getLogger, INFO
+
+logger = getLogger(__name__)
 
 exporter = AzureMonitorTraceExporter.from_connection_string(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"))
 tracer_provider = TracerProvider()
@@ -58,6 +61,8 @@ app = FastAPI(
     version="1.0",
     description="A simple api server using Langchain's Runnable interfaces",
 )
+
+FastAPIInstrumentor.instrument_app(app)
 
 app.add_middleware(
     CORSMiddleware,
