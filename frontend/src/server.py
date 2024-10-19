@@ -10,6 +10,9 @@ import json
 import base64
 from PIL import Image
 import io
+from dotenv import load_dotenv
+
+load_dotenv()
 
 llm = RemoteRunnable(os.getenv("API_ENDPOINT"))
 
@@ -60,8 +63,8 @@ if prompt := st.chat_input(placeholder="How many outstanding shares of stock did
         
                 st.markdown(st.image(image=img, output_format="PNG", caption=None), unsafe_allow_html=True)
             else:
-                st.write(response["messages"][-1].content)
+                st.markdown(response["messages"][-1].content)
                 st.session_state["messages"].append({"role": "assistant", "content": response["messages"][-1].content})
         else:
-            st.write(response["messages"][-1].content)
+            st.markdown(response["messages"][-1].content)
             st.session_state["messages"].append({"role": "assistant", "content": response["messages"][-1].content})
