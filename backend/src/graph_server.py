@@ -1,12 +1,13 @@
 import os
 import uvicorn
 
+from .graph import create_graph
+
 from langserve import APIHandler
-
 from dotenv import load_dotenv
-from typing import Annotated
+from typing import Annotated, AsyncGenerator
 
-from fastapi import FastAPI, Depends, Request, Response
+from fastapi import FastAPI, Depends, Request, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette import EventSourceResponse
 
@@ -19,7 +20,12 @@ from openinference.instrumentation.langchain import LangChainInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from azure.identity import DefaultAzureCredential
 from logging import getLogger, INFO
-from .graph import create_graph
+
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from contextlib import asynccontextmanager
+
 
 logger = getLogger(__name__)
 
@@ -35,24 +41,52 @@ LangChainInstrumentor().instrument()
 #Load environment variables from a .env file
 load_dotenv()
 
+class Settings(BaseSettings):
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = [os.getenv("CORS_URL")]
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+
+settings = Settings()
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Load OpenID config on startup
+    """
+    await azure_scheme.openid_config.load_config()
+    yield
+
 # FastAPI Application
 app = FastAPI(
     title="Gen UI Backend",
     version="1.0",
     description="A simple api server using Langchain's Runnable interfaces",
+    swagger_ui_oauth2_redirect_url="/oauth2-redirect",
+    swagger_ui_init_oauth={
+        'usePkceWithAuthorizationCodeGrant': True,
+        'clientId': os.getenv("OPENAPI_CLIENT_ID")
+    }
 )
 
 # Instrument the FastAPI application with OpenTelemetry and send the data to Application Insights
 FastAPIInstrumentor.instrument_app(app)
 
 # Set up the CORS middleware to allow for cross-origin requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
+
+azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
+    app_client_id=os.getenv("APP_CLIENT_ID"),
+    scopes={
+        f"api://{settings.APP_CLIENT_ID}/user_impersonation": "user_impersonation",
+    },
+    validate_iss=False,
+    allow_guest_users=True
 )
 
 # Create the credential that will be leveraged to access the Azure Container Apps Session Pools
@@ -62,14 +96,14 @@ credential = DefaultAzureCredential()
 
 runnable = create_graph()
 
-async def _get_api_handerl() -> APIHandler: 
+async def _get_api_handler() -> APIHandler: 
     return APIHandler(runnable, path="/v2")
 
 # Ability to invoke a signle question
-@app.post("/v2/financials/invoke")
+@app.post("/v2/financials/invoke", dependencies=[Security(azure_scheme)], include_in_schema=True)
 async def v2_invoke(
     request: Request, 
-    runnable: Annotated[APIHandler, Depends(_get_api_handerl)]
+    runnable: Annotated[APIHandler, Depends(_get_api_handler)]
 ) -> Response:
     """Handle invoke request"""
     return await runnable.invoke(request)
@@ -78,7 +112,7 @@ async def v2_invoke(
 @app.post("/v2/financials/stream")
 async def v2_stream(
     request: Request,
-    runnable: Annotated[APIHandler, Depends(_get_api_handerl)]
+    runnable: Annotated[APIHandler, Depends(_get_api_handler)]
 ) -> EventSourceResponse:
     """Handle stream request"""
     return await runnable.stream(request)

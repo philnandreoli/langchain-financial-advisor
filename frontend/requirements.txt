@@ -5,3 +5,4 @@ langchain==0.3.2
 azure-identity==1.19.0
 langchain_azure_dynamic_sessions==0.2.0
 pillow==10.4.0
+streamlit-oauth==0.1.14
