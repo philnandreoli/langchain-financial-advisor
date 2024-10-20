@@ -12,3 +12,4 @@ opentelemetry-instrumentation-fastapi==0.48b0
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
 langchain-azure-dynamic-sessions==0.2.0
+fastapi-azure-auth==5.0.1

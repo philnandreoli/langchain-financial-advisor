@@ -40,6 +40,19 @@ Currently the functions are as follows:
     AZURE_CLIENT_ID=                    # Service Principal Client ID
     AZURE_TENANT_ID=                    # Tentant ID where the service principal is
     AZURE_CLIENT_SECRET=                # Client Secret for the service Principal
+    # Microsoft Entra App Registration for the API
+    APP_CLIENT_ID=                      # The Client ID for the API
+    OPENAPI_CLIENT_ID=                  # The Client ID for the Open API Swagger Doc Website
+    CORS_URL=                           # The URL for the CORS Configuration
+    # Microsoft Entra App Registration for the Streamlit APplication
+    APP_TENANT_ID=                      # Tenant of the Application Registration
+    AUTHORIZE_ENDPOINT=https://login.microsoftonline.com/${APP_TENANT_ID}/oauth2/v2.0/authorize
+    TOKEN_ENDPOINT=https://login.microsoftonline.com/${APP_TENANT_ID}/oauth2/v2.0/token
+    STREAMLIT_APP_CLIENT_ID=                      # The streamlit application client id
+    API_CLIENT_ID=${APP_CLIENT_ID}
+    APP_CLIENT_SECRET=                  # Client Secret from the application configuration
+    REDIRECT_URI=                       # Redirect URL that is setup for as part of the application configuration
+    ICON_URL=                           # Icon that will be displayed in the application
    ```
 
 # Run the agent

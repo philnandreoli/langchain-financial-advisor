@@ -26,6 +26,9 @@ services:
       - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
       - AZURE_TENANT_ID=${AZURE_TENANT_ID}
       - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - APP_CLIENT_ID=${APP_CLIENT_ID}
+      - OPENAPI_CLIENT_ID=${OPENAPI_CLIENT_ID}
+      - CORS_URL=${CORS_URL}
   chat:
     container_name: langchain-financial-reporting-chat
     image: langchain-financial-reporting-chat:${TAG:-latest}
@@ -38,3 +41,11 @@ services:
       - .env
     environment:
       - API_ENDPOINT=${API_ENDPOINT}
+      - APP_TENANT_ID=${APP_TENANT_ID}
+      - AUTHORIZE_ENDPOINT=${AUTHORIZE_ENDPOINT}
+      - TOKEN_ENDPOINT=${TOKEN_ENDPOINT}
+      - APP_CLIENT_ID=${APP_CLIENT_ID}
+      - API_CLIENT_ID=${API_CLIENT_ID}
+      - APP_CLIENT_SECRET=${APP_CLIENT_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - ICON_URL=${REDIRECT_URI}
