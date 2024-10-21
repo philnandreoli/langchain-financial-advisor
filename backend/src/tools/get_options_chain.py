@@ -32,7 +32,7 @@ def get_options_chain(
     contract_type: Optional[str] = None
 ) -> List[OptionContract]:
     """
-    Used for getting the options chain for a specific stock
+    Used for getting the options chain/contracts for a specific stock
     """
     ticker = yf.Ticker(ticker)
     options = ticker.options[:4]
@@ -48,14 +48,17 @@ def get_options_chain(
                 df = df[df['strike'] >=  strike_price]
             return [OptionContract(**row) for _, row in df[df['inTheMoney'] == False].iterrows()]
 
-        if contract_type is None:
-            option_contracts.extend(filter_options(calls, 'call'))
-            option_contracts.extend(filter_options(puts, 'put'))
-        elif contract_type == 'call':
-            option_contracts.extend(filter_options(calls, 'call'))
-        elif contract_type == 'put':
-            option_contracts.extend(filter_options(puts, 'put'))
-        else:
-            raise ValueError(f"Invalid contract_type: {contract_type}")
+        try:
+            if contract_type is None:
+                option_contracts.append(filter_options(calls, 'call'))
+                option_contracts.append(filter_options(puts, 'put'))
+            elif contract_type == 'call':
+                option_contracts.append(filter_options(calls, 'call'))
+            elif contract_type == 'put':
+                option_contracts.append(filter_options(puts, 'put'))
+            else:
+                raise ValueError(f"Invalid contract_type: {contract_type}")
+        except Exception as e:
+            print(f"Error: {e}")
 
     return option_contracts
