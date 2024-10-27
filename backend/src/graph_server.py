@@ -99,8 +99,14 @@ runnable = create_graph()
 async def _get_api_handler() -> APIHandler: 
     return APIHandler(runnable, path="/v2")
 
+# Check the environment variable
+environment = os.getenv("ENVIRONMENT", "DEVELOPMENT")
+
+# Define dependencies conditionally
+dependencies = [Security(azure_scheme)] if environment != "DEVELOPMENT" else []
+
 # Ability to invoke a signle question
-@app.post("/v2/financials/invoke", dependencies=[Security(azure_scheme)], include_in_schema=True)
+@app.post("/v2/financials/invoke", dependencies=dependencies, include_in_schema=True)
 async def v2_invoke(
     request: Request, 
     runnable: Annotated[APIHandler, Depends(_get_api_handler)]
@@ -109,7 +115,7 @@ async def v2_invoke(
     return await runnable.invoke(request)
 
 # Ability to invoke a single question and get a stream of responses
-@app.post("/v2/financials/stream")
+@app.post("/v2/financials/stream", dependencies=dependencies, include_in_schema=True)
 async def v2_stream(
     request: Request,
     runnable: Annotated[APIHandler, Depends(_get_api_handler)]
