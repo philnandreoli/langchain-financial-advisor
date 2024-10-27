@@ -29,6 +29,7 @@ services:
       - APP_CLIENT_ID=${APP_CLIENT_ID}
       - OPENAPI_CLIENT_ID=${OPENAPI_CLIENT_ID}
       - CORS_URL=${CORS_URL}
+      - ENVIRONMENT=${ENVIRONMENT}
   chat:
     container_name: langchain-financial-reporting-chat
     image: langchain-financial-reporting-chat:${TAG:-latest}
@@ -49,3 +50,4 @@ services:
       - APP_CLIENT_SECRET=${APP_CLIENT_SECRET}
       - REDIRECT_URI=${REDIRECT_URI}
       - ICON_URL=${REDIRECT_URI}
+      - ENVIRONMENT=${ENVIRONMENT}

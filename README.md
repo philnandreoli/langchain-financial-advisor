@@ -53,6 +53,7 @@ Currently the functions are as follows:
     APP_CLIENT_SECRET=                  # Client Secret from the application configuration
     REDIRECT_URI=                       # Redirect URL that is setup for as part of the application configuration
     ICON_URL=                           # Icon that will be displayed in the application
+    ENVIRONMENT=                        # Environment, if it is set to DEVELOPMENT, authentication will be disabled. 
    ```
 
 # Run the agent
