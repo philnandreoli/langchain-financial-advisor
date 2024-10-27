@@ -22,13 +22,14 @@ CLIENT_SECRET=os.getenv("APP_CLIENT_SECRET")
 ICON_URL=os.getenv("ICON_URL")
 REDIRECT_URI=os.getenv("REDIRECT_URI")
 API_CLIENT_ID=os.getenv("API_CLIENT_ID")
+ENVIRONMENT=os.getenv("ENVIRONMENT")
 
 class ChatInputType(BaseModel):
     messages: List[Union[HumanMessage, AIMessage, SystemMessage]]
 
 oauth2 = OAuth2Component(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, authorize_endpoint=AUTHORIZE_ENDPOINT, token_endpoint=TOKEN_ENDPOINT)
 
-if "token" not in st.session_state:
+if "token" not in st.session_state and ENVIRONMENT != "DEVELOPMENT":
     result = oauth2.authorize_button(
         name="Login with Microsoft Entra",
         icon=ICON_URL,
@@ -47,7 +48,11 @@ if "token" not in st.session_state:
             st.session_state.token = token
             st.rerun()
 else:
-    llm = RemoteRunnable(os.getenv("API_ENDPOINT"), headers={"Authorization": "Bearer " + st.session_state["token"]["access_token"]})
+    if ENVIRONMENT != "DEVELOPMENT":
+        llm = RemoteRunnable(os.getenv("API_ENDPOINT"), headers={"Authorization": "Bearer " + st.session_state["token"]["access_token"]})
+    else:
+        llm = RemoteRunnable(os.getenv("API_ENDPOINT"))
+    
     with st.sidebar:
         "Coming Soon"
 
