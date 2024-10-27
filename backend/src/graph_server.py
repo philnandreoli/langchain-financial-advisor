@@ -26,6 +26,8 @@ from pydantic_settings import BaseSettings
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 from contextlib import asynccontextmanager
 
+#Load environment variables from a .env file
+load_dotenv()
 
 logger = getLogger(__name__)
 
@@ -38,13 +40,25 @@ span_processor = BatchSpanProcessor(exporter, schedule_delay_millis=60000)
 trace.get_tracer_provider().add_span_processor(span_processor)
 LangChainInstrumentor().instrument()
 
-#Load environment variables from a .env file
-load_dotenv()
-
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = [os.getenv("CORS_URL")]
     OPENAPI_CLIENT_ID: str = ""
     APP_CLIENT_ID: str = ""
+
+# Check the environment variable
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+
+# FastAPI Application
+if ENVIRONMENT != "DEVELOPMENT":
+    swagger_ui_oauth2_redirect_url = "/oauth2-redirect"
+    swagger_ui_init_oauth = {
+        'usePkceWithAuthorizationCodeGrant': True,
+        'clientId': os.getenv("OPENAPI_CLIENT_ID")
+    }
+else:
+    swagger_ui_oauth2_redirect_url = None
+    swagger_ui_init_oauth = None
+
 
 settings = Settings()
 @asynccontextmanager
@@ -60,11 +74,8 @@ app = FastAPI(
     title="Gen UI Backend",
     version="1.0",
     description="A simple api server using Langchain's Runnable interfaces",
-    swagger_ui_oauth2_redirect_url="/oauth2-redirect",
-    swagger_ui_init_oauth={
-        'usePkceWithAuthorizationCodeGrant': True,
-        'clientId': os.getenv("OPENAPI_CLIENT_ID")
-    }
+    swagger_ui_oauth2_redirect_url=swagger_ui_oauth2_redirect_url,
+    swagger_ui_init_oauth=swagger_ui_init_oauth
 )
 
 # Instrument the FastAPI application with OpenTelemetry and send the data to Application Insights
@@ -99,8 +110,11 @@ runnable = create_graph()
 async def _get_api_handler() -> APIHandler: 
     return APIHandler(runnable, path="/v2")
 
+# Define dependencies conditionally
+dependencies = [Security(azure_scheme)] if ENVIRONMENT != "DEVELOPMENT" else []
+
 # Ability to invoke a signle question
-@app.post("/v2/financials/invoke", dependencies=[Security(azure_scheme)], include_in_schema=True)
+@app.post("/v2/financials/invoke", dependencies=dependencies, include_in_schema=True)
 async def v2_invoke(
     request: Request, 
     runnable: Annotated[APIHandler, Depends(_get_api_handler)]
@@ -109,7 +123,7 @@ async def v2_invoke(
     return await runnable.invoke(request)
 
 # Ability to invoke a single question and get a stream of responses
-@app.post("/v2/financials/stream")
+@app.post("/v2/financials/stream", dependencies=dependencies, include_in_schema=True)
 async def v2_stream(
     request: Request,
     runnable: Annotated[APIHandler, Depends(_get_api_handler)]
