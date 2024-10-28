@@ -20,9 +20,7 @@ def get_weather (location: str) -> str:
     if response.status_code != 200:
         raise ValueError(f"Failed to get weather for {location}")
     else:
-        weather_condition = response.json()["weather"][0]["description"]
-        temperature = response.json()["main"]["temp"]
+        #weather_condition = response.json()["weather"][0]["description"]
+        #temperature = response.json()["main"]["temp"]
 
-        return f"""
-         The temperature in {location} is {temperature} degrees Farenheit.   The current condition is {weather_condition}
-        """
+        return response.json()
