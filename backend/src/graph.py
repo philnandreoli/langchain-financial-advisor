@@ -9,7 +9,7 @@ from .prompts.system_prompt import SYSTEM_PROMPT
 
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
+from langchain_core.messages import SystemMessage, AIMessage, HumanMessage, RemoveMessage
 from langchain_openai import AzureChatOpenAI
 
 from langgraph.checkpoint.memory import MemorySaver
@@ -54,14 +54,31 @@ def call_model(state: MessagesState, config: RunnableConfig):
         azure_deployment="gpt-4o",
         api_version="2023-03-15-preview",
         temperature=0,
-        streaming=True,
+        #streaming=True,
+        max_retries=3
     )
     model_with_tools = model.bind_tools(tools=get_tools())
     system_prompt = SystemMessage(content=SYSTEM_PROMPT)
-    response = model_with_tools.invoke([system_prompt] + state["messages"], config=config)
-    return {
-        "messages": response
-    }
+    message_history = state["messages"][:-1] # exclude the most recent user input
+
+    #Summarize the messages if the chat history reaches a certain size
+    if len(message_history) >= 4 and message_history[-1].type in ["ai", "human"]:
+        last_human_message = state["messages"][-1]
+        summary_prompt = (
+            "Distill the above chat messages into a single summary message.  "
+            "Include as many specific details as you can"
+        )
+        summary_message = model_with_tools.invoke(message_history + [HumanMessage(content=summary_prompt)])
+
+        delete_messages = [RemoveMessage(id=m.id) for m in state["messages"]]
+        human_message = HumanMessage(content=last_human_message.content)
+
+        response = model_with_tools.invoke([system_prompt, summary_message, human_message], config=config)
+        message_updates = [summary_message, human_message, response] + delete_messages
+    else:
+        message_updates = model_with_tools.invoke([system_prompt] + state["messages"], config=config)
+    
+    return { "messages": message_updates }
 
 def filter_messages(messages: list):
     return messages[-1:]
