@@ -9,7 +9,7 @@ from .prompts.system_prompt import SYSTEM_PROMPT
 
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import SystemMessage, AIMessage, HumanMessage, RemoveMessage
+from langchain_core.messages import SystemMessage, AIMessage, HumanMessage, RemoveMessage, trim_messages
 from langchain_openai import AzureChatOpenAI
 
 from langgraph.checkpoint.memory import MemorySaver
@@ -59,26 +59,12 @@ def call_model(state: MessagesState, config: RunnableConfig):
     )
     model_with_tools = model.bind_tools(tools=get_tools())
     system_prompt = SystemMessage(content=SYSTEM_PROMPT)
-    message_history = state["messages"][:-1] # exclude the most recent user input
 
-    #Summarize the messages if the chat history reaches a certain size
-    if len(message_history) >= 4 and message_history[-1].type in ["ai", "human"]:
-        last_human_message = state["messages"][-1]
-        summary_prompt = (
-            "Distill the above chat messages into a single summary message.  "
-            "Include as many specific details as you can"
-        )
-        summary_message = model_with_tools.invoke(message_history + [HumanMessage(content=summary_prompt)])
+    messages = trim_messages(state["messages"], strategy="last", token_counter=len, max_tokens=7, start_on="human", end_on=("human", "tool"), include_system=True)
 
-        delete_messages = [RemoveMessage(id=m.id) for m in state["messages"]]
-        human_message = HumanMessage(content=last_human_message.content)
+    response = model_with_tools.invoke([system_prompt] + messages, config=config)
 
-        response = model_with_tools.invoke([system_prompt, summary_message, human_message], config=config)
-        message_updates = [summary_message, human_message, response] + delete_messages
-    else:
-        message_updates = model_with_tools.invoke([system_prompt] + state["messages"], config=config)
-    
-    return { "messages": message_updates }
+    return { "messages": response }
 
 def filter_messages(messages: list):
     return messages[-1:]
