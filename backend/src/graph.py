@@ -51,8 +51,8 @@ def get_tools() -> list:
 
 def call_model(state: MessagesState, config: RunnableConfig):
     model = AzureChatOpenAI(
-        azure_deployment="gpt-4o",
-        api_version="2023-03-15-preview",
+        azure_deployment=os.getenv("AZURE_OPENAI_MODEL"),
+        api_version=os.getenv("OPENAI_API_VERSION"),
         temperature=0,
         #streaming=True,
         max_retries=3
