@@ -26,8 +26,8 @@ from pydantic_settings import BaseSettings
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 from contextlib import asynccontextmanager
 
-#Load environment variables from a .env file
-load_dotenv()
+#Load environment variables from a .env file and make sure they are refreshed and not cached
+load_dotenv(override=True)
 
 logger = getLogger(__name__)
 

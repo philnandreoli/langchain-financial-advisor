@@ -13,7 +13,8 @@ import io
 from dotenv import load_dotenv
 from streamlit_oauth import OAuth2Component
 
-load_dotenv()
+#Load environment variables from a .env file and make sure they are refreshed and not cached
+load_dotenv(override=True)
 
 AUTHORIZE_ENDPOINT=os.getenv("AUTHORIZE_ENDPOINT")
 TOKEN_ENDPOINT=os.getenv("TOKEN_ENDPOINT")
