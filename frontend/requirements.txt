@@ -6,3 +6,10 @@ azure-identity==1.19.0
 langchain_azure_dynamic_sessions==0.2.0
 pillow==10.4.0
 streamlit-oauth==0.1.14
+azure-monitor-opentelemetry-exporter==1.0.0b30
+azure-monitor-opentelemetry
+openinference-instrumentation-langchain==0.1.28
+opentelemetry-instrumentation-fastapi==0.48b0
+opentelemetry-sdk==1.27.0
+opentelemetry-exporter-otlp==1.27.0
+azure-monitor-opentelemetry==1.6.2
