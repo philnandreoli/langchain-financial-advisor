@@ -18,6 +18,8 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from openinference.instrumentation.langchain import LangChainInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.identity import DefaultAzureCredential
 from logging import getLogger, INFO
 
@@ -31,8 +33,14 @@ load_dotenv(override=True)
 
 logger = getLogger(__name__)
 
+configure_azure_monitor(
+    enable_live_metrics=True
+)
+
 exporter = AzureMonitorTraceExporter.from_connection_string(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"))
-tracer_provider = TracerProvider()
+tracer_provider = TracerProvider(
+    resource=Resource.create({SERVICE_NAME: "langchaing-api"})
+)
 trace_api.set_tracer_provider(tracer_provider)
 trace.set_tracer_provider(tracer_provider)
 tracer = trace.get_tracer(__name__)

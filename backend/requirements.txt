@@ -13,3 +13,4 @@ opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
 langchain-azure-dynamic-sessions==0.2.0
 fastapi-azure-auth==5.0.1
+azure-monitor-opentelemetry==1.6.2
