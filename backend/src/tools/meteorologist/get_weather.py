@@ -9,7 +9,7 @@ class WeatherInput(BaseModel):
 @tool("get_weather", args_schema=WeatherInput)
 def get_weather (location: str) -> str:
     """
-    Useful for getting the weather for a given location
+    Useful for getting the current weather for a given location
     """
     api_key = os.getenv("OPENWEATHER_API_KEY")
     if api_key is None:

@@ -1,10 +1,11 @@
 import os
-from .tools.get_stock_quote import get_stock_quote
-from .tools.get_stock_technical_indicators import get_stock_technical_indicators
-from .tools.get_stock_news import get_stock_news
-from .tools.get_stock_financials import get_stock_financials
-from .tools.get_weather import get_weather
-from .tools.get_options_chain import get_options_chain
+from .tools.finances.get_stock_quote import get_stock_quote
+from .tools.finances.get_stock_technical_indicators import get_stock_technical_indicators
+from .tools.finances.get_stock_news import get_stock_news
+from .tools.finances.get_stock_financials import get_stock_financials
+from .tools.meteorologist.get_weather import get_weather
+from .tools.meteorologist.get_weather_forecast import get_weather_forecast
+from .tools.finances.get_options_chain import get_options_chain
 from .prompts.system_prompt import SYSTEM_PROMPT
 
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
@@ -45,6 +46,7 @@ def get_tools() -> list:
         get_stock_financials,
         get_options_chain,
         get_weather,
+        get_weather_forecast,
         repl
     ]
     return tools
