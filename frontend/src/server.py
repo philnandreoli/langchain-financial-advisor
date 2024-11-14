@@ -115,7 +115,7 @@ def display_messages():
         st.chat_message(message["role"]).write(message["content"])
 
 def handle_user_input(llm):
-    if prompt := st.chat_input(placeholder="How many outstanding shares of stock did Microsoft have in their most recent report?"):
+    if prompt := st.chat_input(placeholder="What is Microsoft's stock price today?"):
         st.session_state["messages"].append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
 
