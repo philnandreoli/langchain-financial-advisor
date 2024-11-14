@@ -30,6 +30,24 @@ services:
       - OPENAPI_CLIENT_ID=${OPENAPI_CLIENT_ID}
       - CORS_URL=${CORS_URL}
       - ENVIRONMENT=${ENVIRONMENT}
+  experimental:
+    container_name: langchain-financial-reporting-experimental
+    image: langchain-financial-reporting-experimental:${TAG:-latest}
+    build:
+      context: experimental
+      dockerfile: Dockerfile
+    ports: 
+      - 8000:8000
+    env_file: ".experimental.env"
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_REALTIME_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_REALTIME_ENDPOINT}
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_REALTIME_DEPLOYMENT}
+      - AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION=${AZURE_OPENAI_REALTIME_CHAT_DEPLOYMENT_VERSION}
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - POLYGON_API_KEY=${POLYGON_API_KEY}
+      - POLYGON_API_ENDPOINT=${POLYGON_API_ENDPOINT}
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPLICATIONINSIGHTS_CONNECTION_STRING}
   chat:
     container_name: langchain-financial-reporting-chat
     image: langchain-financial-reporting-chat:${TAG:-latest}
