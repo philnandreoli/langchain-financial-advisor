@@ -38,7 +38,8 @@ services:
       dockerfile: Dockerfile
     ports: 
       - 8000:8000
-    env_file: ".experimental.env"
+    env_file: 
+      - .env
     environment:
       - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_REALTIME_API_KEY}
       - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_REALTIME_ENDPOINT}
