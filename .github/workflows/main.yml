@@ -11,6 +11,15 @@ jobs:
   development:
     environment: DEVELOPMENT
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - directory: backend
+            container_name: financial-reporting-api
+          - directory: frontend
+            container_name: financial-reporting-chat
+          - directory: experimental
+            container_name: financial-reporting-experimental
     steps:
     - name: Checkout Github Action
       uses: actions/checkout@main
@@ -34,18 +43,4 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          cd backend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/financial-reporting-api:${{ github.sha }} --file Dockerfile .
-
-    - name: Build the Chat Image using Azure Container Registry
-      uses: Azure/cli@v2.1.0
-      with:
-        azcliversion: latest
-        inlineScript: |
-          cd frontend && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/financial-reporting-chat:${{ github.sha }} --file Dockerfile .
-
-    - name: Build the Experimental Image using Azure Container Registry
-      uses: Azure/cli@v2.1.0
-      with:
-        azcliversion: latest
-        inlineScript: |
-          cd experimental && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/financial-reporting-experimental:${{ github.sha }} --file Dockerfile .
+          cd ${{ matrix.directory}} && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/${{ matrix.container_name }}:${{ github.sha }} --file Dockerfile .
