@@ -6,11 +6,11 @@ python-dotenv==1.0.1
 yfinance==0.2.43
 langchain-openai==0.2.0
 pandas_ta==0.3.14b
-azure-monitor-opentelemetry-exporter==1.0.0b30
-openinference-instrumentation-langchain==0.1.28
-opentelemetry-instrumentation-fastapi==0.48b0
-opentelemetry-sdk==1.27.0
-opentelemetry-exporter-otlp==1.27.0
+openinference-instrumentation-langchain==0.1.29
+opentelemetry-instrumentation-fastapi==0.49b2
+opentelemetry-sdk==1.28.2
+opentelemetry-exporter-otlp==1.28.2
 langchain-azure-dynamic-sessions==0.2.0
 fastapi-azure-auth==5.0.1
-azure-monitor-opentelemetry==1.6.2
+azure-monitor-opentelemetry==1.6.4
+httpx==0.27.2
