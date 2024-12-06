@@ -8,7 +8,7 @@ permissions:
   id-token: write
 
 jobs:
-  development:
+  development-build:
     environment: DEVELOPMENT
     runs-on: ubuntu-latest
     strategy:
@@ -44,3 +44,40 @@ jobs:
         azcliversion: latest
         inlineScript: |
           cd ${{ matrix.directory}} && az acr build -r ${{ secrets.AZURE_CONTAINER_REGIStRY }} -t financial-advisor/langchain/${{ matrix.container_name }}:${{ github.sha }} --file Dockerfile .
+  
+  development-deployment:
+    environment: DEVELOPMENT
+    runs-on: ubuntu-latest
+    needs: development-build
+    steps:
+      - name: Azure CLI Login
+        uses: Azure/login@v2.2.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Azure CLI Script
+        uses: Azure/cli@v2.1.0
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+      
+      - name: Deploy the API Image to Azure Container Apps
+        uses: Azure/container-apps-deploy-action@v1
+        with:
+          acrName: ${{ secrets.AZURE_CONTAINER_REGIStRY }}
+          containerAppName: ${{ secrets.FINANCIAL_ADVISOR_API_RESOURCE_NAME }}
+          resourceGroup: ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }}
+          imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGIStRY }}/financial-advisor/langchain/financial-reporting-api:${{ github.sha }}
+      
+      - name: Deploy the Chat Image to Azure Container Apps 
+        uses: Azure/container-apps-deploy-action@v1
+        with:
+          acrName: ${{ secrets.AZURE_CONTAINER_REGIStRY }}
+          containerAppName: ${{ secrets.FINANCIAL_ADVISOR_API_RESOURCE_NAME }}
+          resourceGroup: ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }}
+          imageToDeploy: ${{ secrets.AZURE_CONTAINER_REGIStRY }}/financial-advisor/langchain/financial-reporting-chat:${{ github.sha }}
+        
+
