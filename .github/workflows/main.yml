@@ -69,12 +69,12 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az containerapp revision copy -n  ${{ secrets.FINANCIAL_ADVISOR_API_RESOURCE_NAME }} -g ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }} -i ${{ secrets.AZURE_CONTAINER_REGIStRY }}/financial-advisor/langchain/financial-reporting-api:${{ github.sha }}
+            az containerapp revision copy -n  ${{ secrets.FINANCIAL_ADVISOR_API_RESOURCE_NAME }} -g ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }} -i ${{ secrets.AZURE_CONTAINER_REGIStRY }}.azurecr.io/financial-advisor/langchain/financial-reporting-api:${{ github.sha }}
       
       - name: Deploy the Chat Image to Azure Container Apps 
         uses: Azure/cli@v2.1.0
         with:
           azcliversion: latest
           inlineScript: |
-            az containerapp revision copy -n  ${{ secrets.FINANCIAL_ADVISOR_CHAT_RESOURCE_NAME }} -g ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }} -i ${{ secrets.AZURE_CONTAINER_REGIStRY }}/financial-advisor/langchain/financial-reporting-chat:${{ github.sha }}
+            az containerapp revision copy -n  ${{ secrets.FINANCIAL_ADVISOR_CHAT_RESOURCE_NAME }} -g ${{ secrets.FINANCIAL_ADVISOR_RESOURCE_GROUP }} -i ${{ secrets.AZURE_CONTAINER_REGIStRY }}.azurecr.io/financial-advisor/langchain/financial-reporting-chat:${{ github.sha }}
         
