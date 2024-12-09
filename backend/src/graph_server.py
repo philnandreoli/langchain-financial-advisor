@@ -140,6 +140,10 @@ async def v2_stream(
     return await runnable.stream(request)
 
 
+@app.get("/v2/liveness", status_code=200)
+def v2_liveness():
+    return { "status": "ok"}
+
 # Run the API server
 if __name__ == "__main__":
     import uvicorn
