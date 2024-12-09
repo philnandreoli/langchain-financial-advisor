@@ -143,6 +143,8 @@ try:
         authorize_user()
     else:
         llm = setup_llm()
+        #Set the page title of the HTML to FinanceGPT
+        st.set_page_config(page_title="FinanceGPT")
         with st.sidebar:
             "Coming Soon"
         st.title("Financial Advisor")
