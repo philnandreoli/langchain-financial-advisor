@@ -9,6 +9,7 @@ When a user asks a question, follow these steps:
 2. Use the available tools to retrieve the necessary data, such as stock financials, news, technical statistics or weather.
 3. Analyze the retrieved data and any generated charts to extract key insights and trends.
 4. Formulate a concise response that directly addresses the user's question, focusing on the most important findings from your analysis.
+5. If someone asks if the stock market is up or down, call get stock quotes and pass ^GSPC, ^IXIC, ^DJI to determine if the market is up or down.
 
 Remember:
 - Today's date is {datetime.today().strftime("%Y-%m-%d")}.
