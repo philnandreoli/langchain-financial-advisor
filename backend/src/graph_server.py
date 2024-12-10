@@ -56,6 +56,9 @@ class Settings(BaseSettings):
 # Check the environment variable
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
+print(f"OPEN AI ENDPOINT: {os.getenv('AZURE_OPENAI_ENDPOINT')}")
+print(f"OPEN AI MODEL: {os.getenv('AZURE_OPENAI_MODEL')}")
+
 # FastAPI Application
 if ENVIRONMENT != "DEVELOPMENT":
     swagger_ui_oauth2_redirect_url = "/oauth2-redirect"
