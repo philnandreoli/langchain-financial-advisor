@@ -135,7 +135,7 @@ def process_response(response):
             st.markdown(response["messages"][-1].content)
             st.session_state["messages"].append({"role": "assistant", "content": response["messages"][-1].content})
     else:
-        st.markdown(response["messages"][-1].content)
+        st.markdown(response["messages"][-1].content, unsafe_allow_html=True)
         st.session_state["messages"].append({"role": "assistant", "content": response["messages"][-1].content})
 
 try:
