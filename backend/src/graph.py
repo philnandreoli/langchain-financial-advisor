@@ -6,7 +6,7 @@ from .tools.finances.get_stock_financials import get_stock_financials
 from .tools.meteorologist.get_weather import get_weather
 from .tools.meteorologist.get_weather_forecast import get_weather_forecast
 from .tools.finances.get_options_chain import get_options_chain
-from .prompts.system_prompt import SYSTEM_PROMPT
+from .prompts import SYSTEM_PROMPT, INVESTMENT_RISK_PROFILE_PROMPT
 
 from langchain_azure_dynamic_sessions import SessionsPythonREPLTool
 from langchain_core.runnables import RunnableConfig
@@ -51,7 +51,7 @@ def get_tools() -> list:
     ]
     return tools
 
-def call_model(state: MessagesState, config: RunnableConfig):
+async def call_model(state: MessagesState, config: RunnableConfig):
     model = AzureChatOpenAI(
         azure_deployment=os.getenv("AZURE_OPENAI_MODEL"),
         api_version=os.getenv("OPENAI_API_VERSION"),
@@ -64,7 +64,7 @@ def call_model(state: MessagesState, config: RunnableConfig):
 
     #messages = trim_messages(state["messages"], strategy="last", token_counter=len, max_tokens=15, start_on="human", end_on=("human", "tool"), include_system=True)
 
-    response = model_with_tools.invoke([system_prompt] + state["messages"], config=config)
+    response = await model_with_tools.ainvoke([system_prompt] + state["messages"], config=config)
 
     return { "messages": response }
 
@@ -85,7 +85,6 @@ def create_graph() -> CompiledGraph:
         should_continue,
         ["action", END]
     )
-    
     workflow.add_edge("action", "agent")
 
     graph = workflow.compile(checkpointer=memory).with_types(input_type=ChatInputType, output_type=dict).with_config({"configurable": {"thread_id": "{thread_id}"}})
