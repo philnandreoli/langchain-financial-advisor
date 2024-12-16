@@ -49,6 +49,20 @@ services:
       - POLYGON_API_KEY=${POLYGON_API_KEY}
       - POLYGON_API_ENDPOINT=${POLYGON_API_ENDPOINT}
       - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPLICATIONINSIGHTS_CONNECTION_STRING}
+  user-profile:
+    container_name: langchain-financial-reporting-user-profile
+    image: langchain-financial-reporting-user-profile:${TAG:-latest}
+    build:
+      context: user-profile
+      dockerfile: DOCKERFILE
+    ports:
+      - ${USER_PROFILE_PORT}:${USER_PROFILE_PORT}
+    env_file:
+      - .env
+    environment:
+      - MONGO_USER_NAME=${MONGO_USER_NAME}
+      - MONGO_USER_PASSWORD=${MONGO_USER_PASSWORD}
+      - MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING}
   chat:
     container_name: langchain-financial-reporting-chat
     image: langchain-financial-reporting-chat:${TAG:-latest}
