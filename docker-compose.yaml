@@ -54,7 +54,7 @@ services:
     image: langchain-financial-reporting-user-profile:${TAG:-latest}
     build:
       context: user-profile
-      dockerfile: DOCKERFILE
+      dockerfile: Dockerfile
     ports:
       - ${USER_PROFILE_PORT}:${USER_PROFILE_PORT}
     env_file:
