@@ -16,3 +16,8 @@ services:
     volumes:
       - .:/workspace:cached
     command: sleep infinity
+  user-profile:
+    image: mcr.microsoft.com/devcontainers/python:1-3.11-buster
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity

@@ -20,6 +20,8 @@ jobs:
             container_name: financial-reporting-chat
           - directory: experimental
             container_name: financial-reporting-experimental
+          - directory: user-profile
+            container_name: financial-reporting-user-profile
     steps:
     - name: Checkout Github Action
       uses: actions/checkout@main
