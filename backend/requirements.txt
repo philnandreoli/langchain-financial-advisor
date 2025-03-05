@@ -9,7 +9,7 @@ pandas_ta==0.3.14b
 openinference-instrumentation-langchain==0.1.29
 opentelemetry-instrumentation-fastapi==0.49b2
 opentelemetry-sdk==1.28.2
-opentelemetry-exporter-otlp==1.28.2
+opentelemetry-exporter-otlp==1.30.0
 langchain-azure-dynamic-sessions==0.2.0
 fastapi-azure-auth==5.0.1
 azure-monitor-opentelemetry==1.6.4
