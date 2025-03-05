@@ -6,7 +6,7 @@ azure-monitor-opentelemetry-exporter==1.0.0b30
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
 azure-monitor-opentelemetry==1.6.2
-websockets==14.1
+websockets==15.0
 yfinance==0.2.54
 pandas_ta==0.3.14b
 langchain==0.3.1
