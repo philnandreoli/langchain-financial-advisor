@@ -6,10 +6,18 @@
 version: 2
 updates:
   - package-ecosystem: pip # See documentation for possible values
-    directory: 
-      - "/backend"
-      - "/frontend"
-      - "/user-profile"
-      - "/experimental"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: pip
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: pip
+    directory: "/user-profile"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: pip
+    directory: "/experimental"
     schedule:
       interval: "weekly"
