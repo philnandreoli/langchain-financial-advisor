@@ -9,15 +9,27 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    target-branch: "dependabot-backend"
+    labels:
+      - "pip dependencies"
   - package-ecosystem: pip
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    target-branch: "dependabot-frontend"
+    labels:
+      - "pip dependencies"
   - package-ecosystem: pip
     directory: "/user-profile"
     schedule:
       interval: "weekly"
+    target-branch: "dependabot-user-profile"
+    labels:
+      - "pip dependencies"
   - package-ecosystem: pip
     directory: "/experimental"
     schedule:
       interval: "weekly"
+    target-branch: "dependabot-experimental"
+    labels:
+      - "pip dependencies"
