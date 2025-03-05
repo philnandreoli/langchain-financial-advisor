@@ -4,7 +4,7 @@ langgraph[server]==0.2.34
 langserve[server]==0.3.0
 python-dotenv==1.0.1
 yfinance==0.2.54
-langchain-openai==0.2.0
+langchain-openai==0.3.7
 pandas_ta==0.3.14b
 openinference-instrumentation-langchain==0.1.29
 opentelemetry-instrumentation-fastapi==0.49b2
