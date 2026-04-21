@@ -1,7 +1,7 @@
-chainlit==1.3.0rc1
+chainlit==2.9.4
 openai==1.54.3
 plotly
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 azure-monitor-opentelemetry-exporter==1.0.0b30
 opentelemetry-sdk==1.27.0
 opentelemetry-exporter-otlp==1.27.0
