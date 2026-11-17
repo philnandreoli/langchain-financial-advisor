@@ -8,5 +8,5 @@ opentelemetry-exporter-otlp==1.27.0
 azure-monitor-opentelemetry==1.6.2
 websockets==14.1
 yfinance==0.2.54
-pandas_ta==0.3.14b
+fin-primitives[pandas]==3.5.0
 langchain==0.3.1

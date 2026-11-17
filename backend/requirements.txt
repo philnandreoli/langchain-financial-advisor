@@ -5,7 +5,7 @@ langserve[server]==0.3.0
 python-dotenv==1.0.1
 yfinance==0.2.63
 langchain-openai==0.2.0
-pandas_ta==0.3.14b
+fin-primitives[pandas]==3.5.0
 openinference-instrumentation-langchain==0.1.29
 opentelemetry-instrumentation-fastapi==0.49b2
 opentelemetry-sdk==1.28.2
