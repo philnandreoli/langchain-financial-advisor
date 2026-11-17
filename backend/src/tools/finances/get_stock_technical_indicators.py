@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd
-import pandas_ta as ta
+import fin_primitives.pandas  # noqa: F401  registers df.fp (pandas-ta method names)
 import yfinance as yf
 from pydantic import Field, BaseModel
 from langchain_core.tools import tool
@@ -41,7 +41,7 @@ class StockTechnicalIndicatorOutput(BaseModel):
 
 # Helper Functions
 def calculate_macd(prices):
-    prices.ta.macd(close="Close", fast=12, slow=26, signal=9, append=True)
+    prices.fp.macd(close="Close", fast=12, slow=26, signal=9, append=True)
     prices.rename(columns={"MACD_12_26_9": "macd", "MACDs_12_26_9": "macd_signal", "MACDh_12_26_9": "macd_histogram"}, inplace=True)
 
 def calculate_stochastics(prices):
